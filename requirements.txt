@@ -8,3 +8,6 @@ joblib==1.6.0
 PyYAML==6.0.3
 notebook==7.6.3
 ipykernel==7.3.0
+# Entrega 4: red preentrenada (TensorFlow/Keras) y AutoGluon
+tensorflow==2.21.0
+autogluon.tabular[lightgbm,catboost,xgboost,fastai]==1.6.3

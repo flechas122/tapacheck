@@ -4,7 +4,7 @@
 # 2. Toma fotos de botellas (por defecto valid + test del dataset, que el modelo nunca vio)
 # 3. Recorta siempre el mismo cuadro (camara fija), muestra el veredicto ROSCADA / MAL ROSCADA y el tiempo que tardo
 #
-# Teclas: ESPACIO = siguiente botella, ESC = salir
+# Teclas: ESPACIO = siguiente botella, ESC (o la X de la ventana) = salir
 # Uso:    python demo_tapacheck.py                 (fotos de valid + test del dataset)
 #         python demo_tapacheck.py foto.jpg        (una foto)
 #         python demo_tapacheck.py carpeta/        (todas las fotos de una carpeta)
@@ -121,6 +121,21 @@ if not fotos:
     sys.exit(1)
 
 # 5. Ciclo de inspeccion
+def ventana_abierta():
+    try:
+        return cv2.getWindowProperty(VENTANA, cv2.WND_PROP_VISIBLE) >= 1
+    except cv2.error:
+        return False
+
+def esperar_tecla():
+    # Espera una tecla. Si se cierra la ventana con la X cuenta como ESC; si no, el siguiente imshow la vuelve a abrir.
+    while True:
+        tecla = cv2.waitKey(50)
+        if tecla != -1:
+            return tecla & 0xFF
+        if not ventana_abierta():
+            return 27
+
 aciertos, total, calentado = 0, 0, False
 for ruta in fotos:
     foto = cv2.imread(ruta)
@@ -153,7 +168,7 @@ for ruta in fotos:
     print(f"{os.path.basename(ruta)[:40]:40s} -> {pred:11s} ({ms:.0f} ms)" + (f"  real: {real}" if real in CLASES else ""))
 
     cv2.imshow(VENTANA, np.vstack([panel, frame]))
-    if cv2.waitKey(0) == 27:
+    if esperar_tecla() == 27:   # ESC o la X de la ventana
         break
 
 cv2.destroyAllWindows()
